@@ -9,19 +9,19 @@ import openpyxl
 DB_PATH = "aplusSurLeau.db"
 
 FILES = {
-    "1_DB_Experte.xlsx": {
+    "xlsx/1_DB_Experte.xlsx": {
         "Disciplines":       "db_disciplines",
         "Progression":       "db_progression",
         "Matériel":          "db_materiel",
         "Spots":             "db_spots",
         "Règles de jointure": "db_regles_jointure",
     },
-    "1_Questionnaires.xlsx": {
+    "xlsx/1_Questionnaires.xlsx": {
         "M1 — Quelle discipline": "questionnaire_m1",
         "M2 — Cours et location": "questionnaire_m2",
         "Sheet3":                 "questionnaire_m3",
     },
-    "3-Regles_Association.xlsx": {
+    "xlsx/3-Regles_Association.xlsx": {
         "Règles d'association": "regles_association",
     },
 }
