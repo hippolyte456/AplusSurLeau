@@ -11,51 +11,44 @@
 **AplusSurLeau** c'est un algo qui permet d'accompagner le novice (qui ne part de rien et qui est persuadé que/ou qui ne s'est jamais posé la question et ça lui paraît loin) au cours des différentes étapes d'apprentissage.
 
 **Objectif:**
+
 - → Se poser les bonnes questions, au bon moment
 - → Et savoir y répondre efficacement
 
 ---
 
-## Liste des actions pour le pratiquant
+## Moments clés du parcours
 
-- Choix de l'activité qui me conviendra (planche / wing / parawing / kite)
+### M1 - Choix de l'activité
+Choix de l'activité qui me conviendra (planche / wing / parawing / kite)
+
+### M2 - Apprentissage
 - Ai-je besoin de cours ? Combien ?
 - Quand passer à la loc, surveillée ou non ?
-- Quand acheter du matériel ? Et quoi ? Ça dépend de beaucoup de facteurs
+
+### M3 - Acquisition du matériel
+Quand acheter du matériel ? Et quoi ? Ça dépend de beaucoup de facteurs
 
 ---
 
-## Individualisation
+## Fonctionnement du RAG-LLM
 
-### Les questionnements
-- Quand et où pratiquer ?
-- Est-ce que je sais reconnaître les dangers ?
+<img src="aplusSurLeau_schema_RAG.svg" alt="Schema RAG AplusSurLeau" width="500"/>
 
-### Les spécificités
+**AplusSurLeau** est un RAG-LLM qui permet de répondre précisément et de manière personnalisée aux questionnements des novices du nautisme.
 
-#### Spots
-- Vague et shorebreak à l'entrée ?
-- Grand houle / flat
-- Température de l'eau au cours de l'année
-- Autres particularités du spot
-- Direction vent dominant (off shore ou on shore ?)
+### 1 - Poser les bonnes questions en fonction du contexte du pratiquant
 
-#### Les ressources individuelles
-- Le budget
-- Le temps à consacrer (et comment il se répartit dans l'année)
+Le système adapte ses questions selon:
+- Le profil et le contexte du pratiquant (expérience, budget, disponibilité, localisation)
+- Le moment du parcours (M1, M2, M3)
+- Les spécificités individuelles (ressources, psychologie, caractéristiques physiques)
 
-#### La psychologie
-- Ce que je cherche (sensation / performance)
-- Est-ce que j'ai peur sur l'eau / quel est le sentiment qui me retient
+### 2 - Savoir y répondre en fonction de toutes les particularités qui vont émerger
 
-#### Les caractéristiques physiques
-- Bonne forme / sportif.ve
-- Frileux ou pas ?
-- Handicap
-
----
-
-## Prochaines étapes
-
-- → Publier une mini-version sur wing4all
-- → Envoyer à cdv35 + Erwan Geoffroy
+En fonction des réponses et des éléments qui émergent:
+- Spots (vague, température, vent, particularités)
+- Ressources (budget, temps, disponibilité)
+- Psychologie (sensations cherchées, peurs, motivations)
+- Caractéristiques physiques (condition physique, sensibilité au froid, handicaps)
+- Dangers et sécurité (reconnaissance des risques)
