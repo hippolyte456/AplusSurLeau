@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AplusSurLeau — Chatbot</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #f0f4f8;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: #0077b6;
+      color: white;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    header h1 { font-size: 1.2rem; font-weight: 600; }
+
+    #reset-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.5);
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    #reset-btn:hover { background: rgba(255,255,255,0.15); }
+
+    #messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .msg {
+      max-width: 75%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      line-height: 1.55;
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+
+    .msg.user {
+      align-self: flex-end;
+      background: #0077b6;
+      color: white;
+      border-bottom-right-radius: 3px;
+    }
+
+    .msg.assistant {
+      align-self: flex-start;
+      background: white;
+      color: #1a1a1a;
+      border-bottom-left-radius: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    .msg.error {
+      align-self: flex-start;
+      background: #ffe0e0;
+      color: #c0392b;
+      border-bottom-left-radius: 3px;
+    }
+
+    .typing {
+      align-self: flex-start;
+      background: white;
+      color: #888;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border-bottom-left-radius: 3px;
+      font-size: 0.9rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+
+    form {
+      display: flex;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem;
+      background: white;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    #input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      resize: none;
+      line-height: 1.4;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    #input:focus { outline: none; border-color: #0077b6; }
+
+    #send-btn {
+      background: #0077b6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0 1.2rem;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    #send-btn:disabled { background: #aaa; cursor: default; }
+    #send-btn:hover:not(:disabled) { background: #005f92; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🌊 AplusSurLeau</h1>
+  <button id="reset-btn">Nouvelle conversation</button>
+</header>
+
+<div id="messages">
+  {% for msg in conversation %}
+    <div class="msg {{ msg.role }}">{{ msg.content }}</div>
+  {% empty %}
+    <div class="msg assistant">Bonjour ! Je suis AplusSurLeau 🌊<br>Dis-moi ce qui t'attire dans les sports nautiques, et on va trouver ensemble ce qui te correspond.</div>
+  {% endfor %}
+</div>
+
+<form id="chat-form">
+  {% csrf_token %}
+  <textarea id="input" placeholder="Écris ton message…" rows="1"></textarea>
+  <button id="send-btn" type="submit">Envoyer</button>
+</form>
+
+<script>
+  const messagesEl = document.getElementById("messages");
+  const form = document.getElementById("chat-form");
+  const input = document.getElementById("input");
+  const sendBtn = document.getElementById("send-btn");
+  const resetBtn = document.getElementById("reset-btn");
+
+  function scrollBottom() {
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function addMsg(role, content) {
+    const div = document.createElement("div");
+    div.className = `msg ${role}`;
+    div.textContent = content;
+    messagesEl.appendChild(div);
+    scrollBottom();
+    return div;
+  }
+
+  // Envoi du message
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const message = input.value.trim();
+    if (!message) return;
+
+    addMsg("user", message);
+    input.value = "";
+    input.style.height = "auto";
+    sendBtn.disabled = true;
+
+    const typing = document.createElement("div");
+    typing.className = "typing";
+    typing.textContent = "AplusSurLeau réfléchit…";
+    messagesEl.appendChild(typing);
+    scrollBottom();
+
+    try {
+      const res = await fetch("/chat/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRFToken": document.querySelector("[name=csrfmiddlewaretoken]").value,
+        },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      typing.remove();
+      if (data.reply) {
+        addMsg("assistant", data.reply);
+      } else {
+        addMsg("error", `Erreur : ${data.error}`);
+      }
+    } catch (err) {
+      typing.remove();
+      addMsg("error", "Impossible de contacter le serveur.");
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  });
+
+  // Envoi avec Entrée (Shift+Entrée pour saut de ligne)
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      form.dispatchEvent(new Event("submit"));
+    }
+  });
+
+  // Auto-resize textarea
+  input.addEventListener("input", () => {
+    input.style.height = "auto";
+    input.style.height = input.scrollHeight + "px";
+  });
+
+  // Reset conversation
+  resetBtn.addEventListener("click", async () => {
+    await fetch("/reset/");
+    messagesEl.innerHTML = "";
+    addMsg("assistant", "Bonjour ! Je suis AplusSurLeau 🌊\nDis-moi ce qui t'attire dans les sports nautiques, et on va trouver ensemble ce qui te correspond.");
+  });
+
+  scrollBottom();
+</script>
+
+</body>
+</html>
